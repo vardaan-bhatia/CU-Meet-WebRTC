@@ -1,7 +1,4 @@
-// pages/api/socket.js
-
 import { Server } from "socket.io";
-import http from "http";
 
 const handler = (req, res) => {
   if (res.socket.server.io) {
@@ -10,7 +7,7 @@ const handler = (req, res) => {
     return;
   }
 
-  // Create a new Socket.IO server
+  console.log("Initializing Socket.IO server...");
   const io = new Server(res.socket.server);
 
   io.on("connection", (socket) => {
@@ -21,7 +18,6 @@ const handler = (req, res) => {
     });
   });
 
-  // Attach Socket.IO to the HTTP server
   res.socket.server.io = io;
   res.end();
 };
