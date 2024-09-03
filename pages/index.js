@@ -1,10 +1,12 @@
 import { useSocket } from "@/context/socket";
+import usePeer from "@/hooks/usePeer";
 import { useEffect, useState } from "react";
 
 export default function Home() {
   const socket = useSocket();
-  const [socketID, setSocketID] = useState(null);
+  const [socketID, setSocketID] = useState("");
   const [isServerInitialized, setIsServerInitialized] = useState(false); // Flag to check server initialization
+  const { peer, peerID, connections } = usePeer(); // Use Peer hook
 
   useEffect(() => {
     // Initialize the Socket.IO server once
@@ -46,6 +48,8 @@ export default function Home() {
       ) : (
         <p>Connecting to Socket...</p> // Provide feedback if not connected
       )}
+      <h2>PeerJS with Next.js</h2>
+      {peerID ? <p>Peer ID: {peerID}</p> : <p>Connecting to PeerJS...</p>}
     </div>
   );
 }
