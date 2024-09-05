@@ -1,55 +1,36 @@
-import { useSocket } from "@/context/socket";
-import usePeer from "@/hooks/usePeer";
-import { useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { useRouter } from "next/navigation";
+
+import { useState } from "react";
 
 export default function Home() {
-  const socket = useSocket();
-  const [socketID, setSocketID] = useState("");
-  const [isServerInitialized, setIsServerInitialized] = useState(false); // Flag to check server initialization
-  const { peer, peerID, connections } = usePeer(); // Use Peer hook
+  const router = useRouter();
+  const [roomId, setRoomId] = useState("");
 
-  useEffect(() => {
-    // Initialize the Socket.IO server once
-    const initializeSocketServer = async () => {
-      if (!isServerInitialized) {
-        await fetch("/api/socket");
-        setIsServerInitialized(true); // Set the flag to true after initializing
-      }
-    };
+  const createAndJoin = () => {
+    const roomId = uuidv4();
+    router.push(`/${roomId}`);
+  };
 
-    initializeSocketServer();
-
-    if (socket) {
-      const handleConnect = () => {
-        console.log("Socket connected with ID:", socket.id);
-        setSocketID(socket.id);
-      };
-
-      const handleDisconnect = () => {
-        console.log("Socket disconnected");
-        setSocketID(null); // Clear socket ID on disconnect
-      };
-
-      socket.on("connect", handleConnect);
-      socket.on("disconnect", handleDisconnect);
-
-      return () => {
-        socket.off("connect", handleConnect);
-        socket.off("disconnect", handleDisconnect);
-      };
+  const joinRoom = () => {
+    if (roomId) router.push(`/${roomId}`);
+    else {
+      alert("Please provide a valid room id");
     }
-  }, [socket, isServerInitialized]);
-
+  };
   return (
     <div>
-      <h1>Socket.IO with Next.js</h1>
-      {socketID ? (
-        <p>Socket ID: {socketID}</p>
-      ) : (
-        <p>Connecting to Socket...</p> // Provide feedback if not connected
-      )}
-      <h2>PeerJS with Next.js</h2>
-      {peerID ? <p>Peer ID: {peerID}</p> : <p>Connecting to PeerJS...</p>}
+      <h1>Google Meet Clone</h1>
+      <div>
+        <input
+          placeholder="Enter Room ID"
+          value={roomId}
+          onChange={(e) => setRoomId(e?.target?.value)}
+        />
+        <button onClick={joinRoom}>Join Room</button>
+      </div>
+      <span>--------------- OR ---------------</span>
+      <button onClick={createAndJoin}>Create a new room</button>
     </div>
   );
 }
